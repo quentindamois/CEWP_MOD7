@@ -45,17 +45,18 @@ def empty(content):
     res = []
     for p in range(0,len(content)):
         temp_part = []
-        for l in range(0, content[p]):
+        for l in range(0, len(content[p])):
             if(len(re.findall("\s", content[p][l])) != len(content[p][l])):
                 temp_part.append(content[p][l][:])
         res.append(temp_part[:])
     return res
 
 
-def next_label(list_lign):
+def next_label(list_lign): #TODO: need to fix the function because someone forgot to take care of the fatc that you get out of label
     #to find the next line that is not a label
     set_instru = set(instruction.intruction_dict.keys())
-    if (set_instru.__contains__(list_lign[0])):
+    print(f"the size of the list {len(list_lign)}")
+    if (len(list_lign) <= 0 or set_instru.__contains__(list_lign[0])):
         return 1
     return next_label(list_lign[1:]) + 1
 
@@ -69,13 +70,13 @@ def tag_finder(instruction_label, label_ref):
         if (set_instru.__contains__(instruction_label[i][0])): #we make the distinction between the line about the code and the one about the instruction, in order to do so we look to see if the instruction given is referenced in the dictionnary
             lign_instruction.append(instruction_label[i][:]) #we had the [:] at the end because we need to make a deep copy
         else: #if it is not we will look create a new label
-            label(instruction_label[0], '{0:07b}'.__format__(index_mem), next_label(instruction_label[i:])) #we initialise the new label
-            label_ref['{0:07b}'.__format__(index_mem)] = next_label(instruction_label[i:]) #wa add the bin name as the key and the line corresponding as a value
+            label(instruction_label[0], '{0:07b}'.format(index_mem), next_label(instruction_label[i:])) #we initialise the new label
+            label_ref['{0:07b}'.format(index_mem)] = next_label(instruction_label[i:]) #wa add the bin name as the key and the line corresponding as a value
     return lign_instruction[:] #we return the list of line with only execution
 
 def reg_init():
     for i in range(0,4):
-        register("t" + str(i), '{0:07b}'.__format__(bin(i)))
+        register("t" + str(i), '{0:07b}'.format(i))
 
 def code_to_bin(file_content): #TODO: change the name of the fonction
     label_dict = {}
@@ -93,7 +94,7 @@ def code_to_bin(file_content): #TODO: change the name of the fonction
     for l in clean_line[0]:
         temp_l = l.split(" ")
         #we create a variable by giving it a name wichi is a number in bit and giving it a value which is made by the user
-        variable(temp_l[1], '{0:07b}'.__format__(num_var), temp_l[0])
+        variable(temp_l[1], '{0:07b}'.format(num_var), temp_l[0])
         num_var += 1
     #we have to seperate the line with the tag and the line without
 
@@ -108,10 +109,11 @@ def code_to_bin(file_content): #TODO: change the name of the fonction
                 if (len(re.findall("\d",l[p][0])) != len(l[p])): #if the is one character that mean it is a variable
                     line_code[-1].append(memory.memory_address[memory.name_binary[l[p]]].to_binary())
                 else: # if there is only number that me it is a constant
-                    line_code[-1].append("11" + '{0:07b}'.__format__(bin(int(l[p]))))
+                    line_code[-1].append("11" + '{0:07b}'.format(int(l[p])))
             #we create a list of list
             #each element of the first list is a line with the binary number seperated for execution
     #now we need to pass the information we parsed to the runner class
-    runner.execute(line_code, label_dict)
+    folder = runner()
+    runner.execute(folder, line_code, label_dict)
 
 code_to_bin(get_code())
