@@ -1,8 +1,11 @@
 from Memory import *
 import re
 
-def get_code():#TODO: create the fonction that get the file in the first place
-    print("not completed yet")
+def get_code():
+    file = open("demofile.txt","r") #we open the file to read it
+    res = file.read()
+    file.close()
+    return res
 
 def part_separation(file_content):
     #the purpose of this function is to seperate the part were we initialise the variable and the parte were we have code
@@ -110,3 +113,5 @@ def code_to_bin(file_content): #TODO: change the name of the fonction
             #each element of the first list is a line with the binary number seperated for execution
     #now we need to pass the information we parsed to the runner class
     runner.execute(line_code, label_dict)
+
+code_to_bin(get_code())
