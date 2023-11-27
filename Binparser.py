@@ -71,7 +71,7 @@ def init_inst():
     HLT()
 
 
-def main():
+def main(): #TODO complete the bin conversion
     essaie = runner()
     label = {}
     reg_init()
