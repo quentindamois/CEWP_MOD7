@@ -3,6 +3,22 @@ import random
 #this is the objected oriented part of the programm were the programm is run once it is parsed
 #this is justed a library and the relant object are used when necessary in the main file
 
+def binstr_to_bin(number):
+    res = 0
+    for i in range(len(number)):
+        if number[-(i + 1)] == '1':
+           res += 2**i
+    return res
+
+def check_arg(type_arg, arg, op_code, number):
+    if (op_code != "10011" and type_arg != "11"):
+        if(number == 1 and(15  < binstr_to_bin(op_code) or 19 > binstr_to_bin(op_code))):
+            return memory.memory_address[arg]
+        return memory.memory_address.values
+    elif (type_arg == "11"):
+        return binstr_to_bin(arg)
+    return 0
+
 class memory:
     #this the class memory this class is an interface like class used for the parameter class as a mean to have a static method for the variable
     memory_address = {}
@@ -77,9 +93,23 @@ class runner:
         #new take for the line navigatio
         #uncomplete is used as a condition for navigating
         index_ligne = 0 #index_lign is used to chose wich line need to be executed
-        while 0 >= index_ligne: #DONE: change the condition because the instruction for the end is not always the last
-            temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].execute_instruction(memory(parsed[index_ligne][2]),memory(parsed[index_ligne][4]).value if parsed[index_ligne][3] != "11" else parsed[index_ligne][4], line_tag[parsed[index_ligne][5]] if (14 <= bin("0b" + parsed[index_ligne][0]) and 14 >= bin("0b" + parsed[index_ligne][1])) else 0  )
+        print("it work in the beginning")
+        while 0 <= index_ligne: #DONE: change the condition because the instruction for the end is not always the last
+
+            """print(parsed[index_ligne][0])
+            print(memory.memory_address[parsed[index_ligne][2]])
+            print(memory.memory_address[parsed[index_ligne][4]].value if parsed[index_ligne][3] != "11" else binstr_to_bin(parsed[index_ligne][4]))
+            print(binstr_to_bin(parsed[index_ligne][0]))
+            print(line_tag[parsed[index_ligne][5]] if (14 <= binstr_to_bin(parsed[index_ligne][0]) and 14 >= binstr_to_bin(parsed[index_ligne][1])) else 0  )
+            print()"""
+            #line_tag[parsed[index_ligne][5]] if (14 <= binstr_to_bin(parsed[index_ligne][0]) and 14 >= binstr_to_bin(parsed[index_ligne][1])) else 0
+            temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].execute_instruction(check_arg(parsed[index_ligne][1], parsed[index_ligne][2], parsed[index_ligne][0], 1), check_arg(parsed[index_ligne][3], parsed[index_ligne][4], parsed[index_ligne][0], 2), 0)
+            print("work")
+            print(f"temp_rec: {temp_rec}")
+            print(f"index_lign  before: {index_ligne}")
             index_ligne  = temp_rec if temp_rec != 0  else index_ligne + 1
+            print(f"index_lign adter: {index_ligne}")
+            print(index_ligne)
         return 0
 
 #in each instruction we use the parant initialisation with the op code specific to that instruction
@@ -229,6 +259,7 @@ class JMP(instruction):
         return target_label.value
 #20
 class HLT(instruction):
+    print("quit command")
     def __init__(self):
         super().__init__("10011")
     def execute_instruction(self, param_trash_0, param_trash_1, param_trash_2): #DONE: rewrite the function
