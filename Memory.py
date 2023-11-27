@@ -261,6 +261,7 @@ class ADD(instruction):
         res = [lign[:5]]
         res.append(lign[5:7])
         res.append(lign[7:9])
+        print(res)
         res.append(lign[9:11])
         res.append(lign[11:])
         return res[:]

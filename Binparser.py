@@ -16,11 +16,11 @@ def line_distinction(file_content):
 
 def bin_part(file_content):
     parsed_line = []
-    file_content = file_content.spli("\n")
+    file_content = file_content.split("\n")
     if (len(file_content) < 2):
         file_content = line_distinction(file_content)[:]
-    for l in file_content:
-        parsed_line.append(l[:5])
+    """for l in file_content:
+        parsed_line.append([l[:5]])
         i = 5
         while(i < len(l[5:])):
             parsed_line[-1].append(l[i: i + 2])
@@ -29,8 +29,8 @@ def bin_part(file_content):
                 i = i + 4
             else:
                 parsed_line[-1].append(l[i + 2 : i + 9])
-                i = i + 9
-    return parsed_line
+                i = i + 9"""
+    return file_content[:]
 
 def label_creator(parsed_line):
     dict_label = []
@@ -98,7 +98,7 @@ def var_init(parsed_line):
 
 
 
-def main(): #TODO complete the bin conversion
+def main():
     essaie = runner()
     reg_init()
     init_inst()
