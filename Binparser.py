@@ -72,7 +72,7 @@ def init_inst():
 
 
 def label_init(line, n):
-    label(line[7:14],"l" + str(n) , n)
+    label(n,"l" + str(n) , line[7:])
 
 def instruction_parsing(content_ling):
     res = []
