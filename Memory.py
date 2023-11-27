@@ -92,7 +92,7 @@ class instruction:
 class runner:
     #the runner class is used to instancied an object tha will execute each line of code
 
-    def execute(self,parsed, line_tag): #the line_tag store the tag in the code
+    def execute(self,parsed): #the line_tag store the tag in the code
         #parsed is the binary seperated in chunck of relevant information
         #for example the first block is always the op code of the instruction
         #new take for the line navigatio
@@ -100,22 +100,12 @@ class runner:
         index_ligne = 0 #index_lign is used to chose wich line need to be executed
         print("it work in the beginning")
         while 0 <= index_ligne: #DONE: change the condition because the instruction for the end is not always the last
-
-            """print(parsed[index_ligne][0])
-            print(memory.memory_address[parsed[index_ligne][2]])
-            print(memory.memory_address[parsed[index_ligne][4]].value if parsed[index_ligne][3] != "11" else binstr_to_bin(parsed[index_ligne][4]))
-            print(binstr_to_bin(parsed[index_ligne][0]))
-            print(line_tag[parsed[index_ligne][5]] if (14 <= binstr_to_bin(parsed[index_ligne][0]) and 14 >= binstr_to_bin(parsed[index_ligne][1])) else 0  )
-            print()"""
-            #line_tag[parsed[index_ligne][5]] if (14 <= binstr_to_bin(parsed[index_ligne][0]) and 14 >= binstr_to_bin(parsed[index_ligne][1])) else 0
-            #temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].execute_instruction(check_arg(parsed[index_ligne][1], parsed[index_ligne][2], parsed[index_ligne][0], 1), check_arg(parsed[index_ligne][3], parsed[index_ligne][4], parsed[index_ligne][0], 2), 0)
-            temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].param_selection(parsed[index_ligne][1:])
-            print("work")
-            print(f"temp_rec: {temp_rec}")
-            print(f"index_lign  before: {index_ligne}")
+            set_instruction = set(instruction.intruction_dict.keys())
+            if (parsed[index_ligne][0] in set_instruction):
+                temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].param_selection(parsed[index_ligne][1:])
+            else:
+                temp_rec = 0
             index_ligne  = temp_rec if temp_rec != 0  else index_ligne + 1
-            print(f"index_lign adter: {index_ligne}")
-            print(index_ligne)
         return 0
 
 #in each instruction we use the parant initialisation with the op code specific to that instruction

@@ -71,12 +71,40 @@ def init_inst():
     HLT()
 
 
+def label_init(line, n):
+    label(line[7:14],"l" + str(n) , n)
+
+def instruction_parsing(content_ling):
+    res = []
+    set_instruction = set(instruction.intruction_dict.keys())
+    for l in range(len(content_ling)):
+        if(content_ling[l][:5] in set_instruction):
+            res.append(instruction.intruction_dict[content_ling[l][:5]].bin_parser(content_ling[l])[:])
+        else:
+            res.append([content_ling[l][:5], content_ling[l][5:7], content_ling[l][7:14]])
+            label_init(content_ling[l], l)
+    return res [:]
+
+def var_init(parsed_line):
+    var_set = set()
+    for l in range(1, len(parsed_line), 2):
+        if (("01" in parsed_line[l])):
+            var_set.add(parsed_line[l + 1])
+    for v in var_set:
+        name_var = input("Enter the name of the first variable")
+        value_var = input(f"Enter the the value of {name_var}:")
+        variable(value_var,name_var, v)
+
+
+
+
 def main(): #TODO complete the bin conversion
     essaie = runner()
-    label = {}
     reg_init()
     init_inst()
-    parsed_line = [["00111","10","00","11","000000000000000000001"],["00111","10","00","11","000000000000000000010"], ["10011","00","0000000","00","0000000000000000"]]
-    runner.execute(essaie, parsed_line, label)
+    parsed_line = instruction_parsing(bin_part(get_code()))
+    #parsed_line = [["00111","10","00","11","000000000000000000001"],["00111","10","00","11","000000000000000000010"], ["10011","00","0000000","00","0000000000000000"]]
+    var_init(parsed_line)
+    runner.execute(essaie, parsed_line)
 
 main()
