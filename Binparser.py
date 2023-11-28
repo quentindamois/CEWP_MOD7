@@ -87,12 +87,13 @@ def instruction_parsing(content_ling):
 
 def var_init(parsed_line):
     var_set = set()
-    for l in range(1, len(parsed_line), 2):
-        if (("01" in parsed_line[l])):
-            var_set.add(parsed_line[l + 1])
+    for i in range(0, len(parsed_line)):
+        for l in range(1, len(parsed_line[i]), 2):
+            if (("01" in parsed_line[i][l])):
+                var_set.add(parsed_line[i][l + 1])
     for v in var_set:
         name_var = input("Enter the name of the first variable")
-        value_var = input(f"Enter the the value of {name_var}:")
+        value_var = int(input(f"Enter the the value of {name_var}:"))
         variable(value_var,name_var, v)
 
 

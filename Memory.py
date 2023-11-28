@@ -155,9 +155,9 @@ class STR(instruction):
     def bin_parser(self, lign):
         res = [lign[:5]]
         res.append(lign[5:7])
-        res.append(lign[7:9])
-        res.append(lign[9:11])
-        res.append(lign[11:])
+        res.append(lign[7:14])
+        res.append(lign[14:16])
+        res.append(lign[16:])
         return res[:]
 #3
 class PUSH(instruction):
