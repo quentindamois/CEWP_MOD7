@@ -114,6 +114,7 @@ class runner:
             set_instruction = set(instruction.intruction_dict.keys())
             if (parsed[index_ligne][0] in set_instruction):
                 temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].param_selection(parsed[index_ligne][1:])
+                print(instruction.intruction_dict[parsed[index_ligne][0]].line_displayer(parsed[index_ligne][1:]))
             else:
                 temp_rec = 0
             index_ligne  = temp_rec if temp_rec != 0  else index_ligne + 1
@@ -604,4 +605,4 @@ class HLT(instruction):
         res = [lign[:5]]
         return res[:]
     def line_displayer(self, parsed_list=0):
-        super().line_displayer([])
+        return super().line_displayer([])
