@@ -99,7 +99,7 @@ def var_init(parsed_line):
 
 
 
-def main():
+def main(): #TODO: remove the initialisation of the tag and the var here and find a way to link it with the codeparser.py
     essaie = runner()
     reg_init()
     init_inst()

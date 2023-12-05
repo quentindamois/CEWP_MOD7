@@ -52,7 +52,7 @@ def empty(content):
     return res
 
 
-def next_label(list_lign): #TODO: need to fix the function because someone forgot to take care of the fatc that you get out of label
+def next_label(list_lign): #TODO: modify the label so that we initailise the parameter abel
     #to find the next line that is not a label
     set_instru = set(instruction.intruction_dict.keys())
     print(f"the size of the list {len(list_lign)}")
@@ -74,9 +74,35 @@ def tag_finder(instruction_label, label_ref):
             label_ref['{0:07b}'.format(index_mem)] = next_label(instruction_label[i:]) #wa add the bin name as the key and the line corresponding as a value
     return lign_instruction[:] #we return the list of line with only execution
 
+def find_label(label_asked, code_content):
+    i = 0
+    while(not(label_asked in code_content[i])):
+        i += i
+    return i
+
+def tag_parser(code_content):
+    line_label = re.findall(".+:", "\n".join(code_content))[:]
+    for i in range(0,len(line_label)):
+        label(find_label(line_label[i], code_content), line_label[i][1:], '{0:07b}'.format(i))
+
 def reg_init():
     for i in range(0,4):
         register("t" + str(i), '{0:07b}'.format(i))
+
+def code_parser(code_part): #complete the fonnction so that it result in a string similar to the one previusly found in the pseudo_binary file
+    bin_file_content = ""
+    instruction_convertion = {"LDA": "00000", "STR": "00001", "PUSH": "00010", "POP": "00011", "AND": "00100","OR": "00101", "NOT": "00110", "ADD": "00111", "SUB": "01000", "DIV": "01001","MUL": "01010", "MOD": "01011", "INC": "01100", "DEC": "01101", "BEQ": "01110","BNE": "01111", "BBG": "10000", "BSM": "10001", "JMP": "10010", "HLT": "10011"}
+    for i in code_part:
+        if (i.split(" ")[0] in instruction_convertion.keys()):
+            line_i = i.split(" ")
+            bin_file_content = instruction.intruction_dict[instruction_convertion[line_i]] #TODO: complete this line so that a pseudo bianry line is added to the rsult string
+        #TODO: create the case where it is a string
+        #TODO: create the case where it is nothing
+        #TODO: think about the fact that the value of the label and the position in the code may be different at the end if you have line that mean nothing
+
+
+
+
 
 def code_to_bin(file_content): #TODO: change the name of the fonction
     label_dict = {}
@@ -84,36 +110,38 @@ def code_to_bin(file_content): #TODO: change the name of the fonction
     effective_line = {}
     reg_init()
     #we need to differciented the data and the code
-    hierchised_line = part_separation(file_content)
-    for p in range(0, len(hierchised_line)):
-        hierchised_line[p] = hierchised_line[p].split("\n")[1:]
-    clean_line = empty(hierchised_line)
+    seperated_line = re.split("#DATA|#CODE", get_code())[1:]
+    for p in range(0, len(seperated_line)):
+        seperated_line[p] = seperated_line[p].split("\n")[:]
+    clean_line = empty(seperated_line)
     #once we have the different kind
     #we are assigning a binary code for each
     num_var = 4
     for l in clean_line[0]:
         temp_l = l.split(" ")
         #we create a variable by giving it a name wichi is a number in bit and giving it a value which is made by the user
-        variable(temp_l[1], '{0:07b}'.format(num_var), temp_l[0])
+        variable(temp_l[1], temp_l[0], '{0:07b}'.format(num_var))
         num_var += 1
     #we have to seperate the line with the tag and the line without
 
     init_inst() #initialisation of the instrucition
     #Now we parse the code part
-    line_code = tag_finder(clean_line[1], label_dict)[:]
-    set_instru = set(instruction_convertion.keys())
-    for l in line_code:
+    #line_code = tag_finder(clean_line[1], label_dict)[:]
+    tag_parser(clean_line[1][:])
+    code_parser(clean_line[1][:])
+    """for l in line_code:
         if(set_instru.__contains__(l[0])):
             line_code.append([instruction.intruction_dict[l[0]]])
             for p in range(1, len(l)):
                 if (len(re.findall("\d",l[p][0])) != len(l[p])): #if the is one character that mean it is a variable
                     line_code[-1].append(memory.memory_address[memory.name_binary[l[p]]].to_binary())
                 else: # if there is only number that me it is a constant
-                    line_code[-1].append("11" + '{0:07b}'.format(int(l[p])))
+                    line_code[-1].append("11" + '{0:07b}'.format(int(l[p])))"""
+
             #we create a list of list
             #each element of the first list is a line with the binary number seperated for execution
     #now we need to pass the information we parsed to the runner class
-    folder = runner()
-    runner.execute(folder, line_code, label_dict)
+    #folder = runner()
+    #runner.execute(folder, line_code, label_dict)
 
 code_to_bin(get_code())

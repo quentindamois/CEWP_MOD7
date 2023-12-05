@@ -1,4 +1,7 @@
 import random
+import re
+
+#TODO: verif the fonction that create the binary line
 
 #this is the objected oriented part of the programm were the programm is run once it is parsed
 #this is justed a library and the relant object are used when necessary in the main file
@@ -41,24 +44,24 @@ class parameter(memory):
     #this is class is used as parant class to create the commun part between the regeteri and the variable
     def __init__(self, value, name, var_code, type):
         super().__init__()
+        self.type = type
         self.value = value
+        self.var_code = var_code
         self.name = name #probaby change to being a binary code specific to a variable or a register
         self.address = memory.total_size #i don t really know what to do with it since it may not benecessary for the first part
         memory.memory_address[ (type, rm_last_bit(var_code))] = self
         memory.total_size = memory.total_size + self.__sizeof__()
-        memory.name_binary[rm_last_bit(var_code)] = name
-        memory.binary_name[name] = rm_last_bit(var_code)
-    def to_binary(self):
-        #DONE: implement the function to every class
-        print("not implemented")
+        #memory.name_binary[rm_last_bit(var_code)] = name
+        memory.binary_name[name] = (self.type, rm_last_bit(var_code))
+    def to_binary(self, n):
+        #to reference a parameter in binary we first add its type then the var_code with a varying amount of bit
+        return self.type + '{0:0'+ n + 'b}'.format(binstr_to_bin(self.var_code))
 
 
 class register(parameter):
     #this the register class, unlike the variable there initial value is set on zero
     def __init__(self, name, var_code):
         super().__init__(0, name, var_code, "10")
-    def to_binary(self):
-        return "10" + memory.name_binary[self.name]
 
 
 class variable(parameter):
@@ -66,15 +69,10 @@ class variable(parameter):
     #it is used to differentiate the register object and the variable
     def __init__(self, value, name, var_code):
         super().__init__(value, name, var_code, "01")
-    def to_binary(self):
-        return "01" + memory.name_binary[self.name]
 
 class label(parameter):
     def __init__(self, value, name, var_code):
         super().__init__(value, name, var_code, "00")
-
-    def to_binary(self):
-        return "00" + memory.name_binary[self.name]
 class instruction:
     #this a parent class to the 20 instruction requiered for the completion of part 1
     intruction_dict = {} # this variable is a dictionari used to stored the on object of the different instruction and the OP code
@@ -96,7 +94,15 @@ class instruction:
         for i in arg_list:
             res += f" {i}"
         return res
-
+    def bin_writer(self, lines, param_len):
+        res = self.op_code
+        for i in range(0, len(param_len)):
+            if(len(re.findall("\w",lines[i + 1]))):
+                res += memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
+            else:
+                res += "11" + '{0:0' + param_len[i] + 'b}'.format(int(lines[i + 1]))
+            res += "\n"
+        return res
 
 
 
@@ -152,7 +158,8 @@ class LDA(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
-
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [2, 16])
 #2
 class STR(instruction):
     def __init__(self):
@@ -170,6 +177,7 @@ class STR(instruction):
             #                            str(binstr_to_bin(parsed_list[3]))])
         return res
 
+
     def bin_parser(self, lign):
         res = [lign[:5]]
         res.append(lign[5:7])
@@ -177,6 +185,9 @@ class STR(instruction):
         res.append(lign[14:16])
         res.append(lign[16:])
         return res[:]
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 16])
+
     def line_displayer(self, parsed_list):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
@@ -202,6 +213,8 @@ class PUSH(instruction):
         return res[:]
     def line_displayer(self, parsed_list):
         return super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list(25))
 #4
 class POP(instruction):
     def __init__(self):
@@ -222,6 +235,8 @@ class POP(instruction):
         return res[:]
     def line_displayer(self, parsed_list):
         return super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list(25))
 #5
 class AND(instruction):
     def __init__(self):
@@ -243,6 +258,8 @@ class AND(instruction):
         res.append(lign[9:11])
         res.append(lign[11:])
         return res[:]
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
     def line_displayer(self, parsed_list):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
@@ -276,6 +293,8 @@ class OR(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
 #7
 class NOT(instruction):
     def __init__(self):
@@ -293,6 +312,8 @@ class NOT(instruction):
         return res[:]
     def line_displayer(self, parsed_list):
         return super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list(25))
 #8
 class ADD(instruction):
     def __init__(self):
@@ -320,6 +341,8 @@ class ADD(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
 #9
 class SUB(instruction):
     def __init__(self):
@@ -347,6 +370,8 @@ class SUB(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
 #10
 class DIV(instruction):
     def __init__(self):
@@ -374,6 +399,8 @@ class DIV(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
 #11
 class MUL(instruction):
     def __init__(self):
@@ -404,6 +431,8 @@ class MUL(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
 #12
 class MOD(instruction):
     def __init__(self):
@@ -433,6 +462,8 @@ class MOD(instruction):
         else:
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7, 21])
 #13
 class INC(instruction):
     def __init__(self):
@@ -444,11 +475,13 @@ class INC(instruction):
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
     def bin_parser(self, lign):
         res = [lign[:5]]
-        res.append(lign[2:4])
-        res.append(lign[4:])
+        res.append(lign[5:7])
+        res.append(lign[7:])
         return res[:]
     def line_displayer(self, parsed_list):
         return super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list(25))
 #14
 class DEC(instruction):
     def __init__(self):
@@ -467,6 +500,8 @@ class DEC(instruction):
         return res[:]
     def line_displayer(self, parsed_list):
         return super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list(25))
 #15
 class BEQ(instruction):
     def __init__(self):
@@ -492,6 +527,8 @@ class BEQ(instruction):
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
         second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7,7,7])
 #16
 class BNE(instruction):
     def __init__(self):
@@ -520,6 +557,8 @@ class BNE(instruction):
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
         second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7,7,7])
 #17
 class BBG(instruction):
     def __init__(self):
@@ -548,6 +587,8 @@ class BBG(instruction):
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
         second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7,7,7])
 #18
 class BSM(instruction):
     def __init__(self):
@@ -576,6 +617,8 @@ class BSM(instruction):
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
         second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, [7,7,7])
 #19
 class JMP(instruction):
     def __init__(self):
@@ -592,6 +635,8 @@ class JMP(instruction):
         return res[:]
     def line_displayer(self, parsed_list):
         return super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list(25))
 #20
 class HLT(instruction):
     print("quit command")
@@ -606,3 +651,5 @@ class HLT(instruction):
         return res[:]
     def line_displayer(self, parsed_list=0):
         return super().line_displayer([])
+    def bin_writer(self, lines):
+        super().bin_writer(lines, list())
