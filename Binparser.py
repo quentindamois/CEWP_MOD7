@@ -1,4 +1,5 @@
 from Memory import *
+from Codeparser import *
 import re
 
 def get_code():
@@ -74,15 +75,14 @@ def init_inst():
 def label_init(line, n):
     label(n,"l" + str(n) , line[7:])
 
-def instruction_parsing(content_ling):
+def instruction_parsing(content_ling): #unused
     res = []
     set_instruction = set(instruction.intruction_dict.keys())
     for l in range(len(content_ling)):
         if(content_ling[l][:5] in set_instruction):
             res.append(instruction.intruction_dict[content_ling[l][:5]].bin_parser(content_ling[l])[:])
         else:
-            res.append([content_ling[l][:5], content_ling[l][5:7], content_ling[l][7:14]])
-            label_init(content_ling[l], l)
+            res.append([content_ling[l][:5], content_ling[l][5:7], content_ling[l][7:]])
     return res [:]
 
 def var_init(parsed_line):
@@ -99,11 +99,11 @@ def var_init(parsed_line):
 
 
 
-def main(): #TODO: remove the initialisation of the tag and the var here and find a way to link it with the codeparser.py
+def main():
     essaie = runner()
     reg_init()
     init_inst()
-    parsed_line = instruction_parsing(bin_part(get_code()))
+    parsed_line = instruction_parsing(bin_part(init_and_code_to_bin()))
     #parsed_line = [["00111","10","00","11","000000000000000000001"],["00111","10","00","11","000000000000000000010"], ["10011","00","0000000","00","0000000000000000"]]
     var_init(parsed_line)
     runner.execute(essaie, parsed_line)
