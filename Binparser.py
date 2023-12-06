@@ -105,7 +105,6 @@ def main():
     init_inst()
     parsed_line = instruction_parsing(bin_part(init_and_code_to_bin()))
     #parsed_line = [["00111","10","00","11","000000000000000000001"],["00111","10","00","11","000000000000000000010"], ["10011","00","0000000","00","0000000000000000"]]
-    var_init(parsed_line)
     runner.execute(essaie, parsed_line)
 
 main()

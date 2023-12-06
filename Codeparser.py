@@ -103,7 +103,11 @@ def code_parser(code_part): #complete the fonnction so that it result in a strin
         #if it is not identifired as line for instruction or a line were a tag is located
     return bin_file_content[:-1]
 
-
+def comment_remover(code):
+    for i in range(0, 2):
+        for j in range(0, len(code[i])):
+            code[i][j] = code[i][j].split("!")[0][:]
+    return code[:]
 
 
 
@@ -114,9 +118,11 @@ def init_and_code_to_bin():
     for p in range(0, len(seperated_line)):
         seperated_line[p] = seperated_line[p].split("\n")[:]
     clean_line = empty(seperated_line)
+    clean_line = comment_remover(clean_line)
+    clean_line = empty(clean_line)
     #once we have the different kind
     #we are assigning a binary code for each
-    num_var = 4
+    num_var = 0
     for l in clean_line[0]:
         temp_l = l.split(" ")
         #we create a variable by giving it a name wichi is a number in bit and giving it a value which is made by the user
