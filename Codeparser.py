@@ -77,13 +77,13 @@ def tag_finder(instruction_label, label_ref): #unused
 def find_label(label_asked, code_content):
     i = 0
     while(not(label_asked in code_content[i])):
-        i += i
+        i += 1
     return i
 
 def tag_parser(code_content):
     line_label = re.findall(".+:", "\n".join(code_content))[:]
     for i in range(0,len(line_label)):
-        label(find_label(line_label[i], code_content), line_label[i][1:], '{0:07b}'.format(i))
+        label(find_label(line_label[i], code_content), line_label[i][:-1], '{0:07b}'.format(i))
 
 def reg_init():
     for i in range(0,4):
@@ -98,8 +98,8 @@ def code_parser(code_part): #complete the fonnction so that it result in a strin
             line_i = code_part[i].split(" ")
             bin_file_content += instruction.intruction_dict[instruction_convertion[line_i[0]]].bin_writer(line_i) #this is tha line that convertert a line whith an instruction to a a binary line
         elif (re.findall(".+:", code_part[i])):
-            bin_file_content += "11111" + memory.memory_address(memory.binary_name(code_part[i].split(":")[:])).to_binary(25) + "\n" #this is the line where we parse the line with tag
-            memory.memory_address(memory.binary_name(code_part[i].split(":")[:])).value = i #actualise the value to make sure that the label doesn't point to a line
+            bin_file_content += ("11111" + memory.memory_address[memory.binary_name[code_part[i].split(":")[0]]].to_binary(25) + "\n") #this is the line where we parse the line with tag
+            memory.memory_address[memory.binary_name[code_part[i].split(":")[0]]].value = i #actualise the value to make sure that the label doesn't point to a line
         #if it is not identifired as line for instruction or a line were a tag is located
     return bin_file_content[:-1]
 
