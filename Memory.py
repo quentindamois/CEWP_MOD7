@@ -82,9 +82,10 @@ class instruction:
     #this a parent class to the 20 instruction requiered for the completion of part 1
     intruction_dict = {} # this variable is a dictionari used to stored the on object of the different instruction and the OP code
     #the op code is used as key in the dictionnary
-    def __init__(self, op_code, name):
+    def __init__(self, op_code, name, allowed):
         self.op_code = op_code
         self.name = name
+        self.allowed = allowed[:]
         instruction.intruction_dict[op_code] = self
     #this the base version of the function that is overidden by every subclass
     #DONE: change the parameter of the base version of execute_instruction in the parent class
@@ -110,6 +111,11 @@ class instruction:
                 res += memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
         res += "\n"
         return res
+    def param_type_check(self, lines):
+        #the lines doesn't contain the op code for the instruction
+        for i in range(0, len(self.allowed)):
+            if (not(lines[2 * i] in self.allowed[i])):
+                raise SyntaxError(self.line_displayer(lines) + f": Wrong type for the argument {i + 1}.")
 
 
 
@@ -141,11 +147,12 @@ class runner:
 #1
 class LDA(instruction):
     def __init__(self):
-        super().__init__("00000", "LDA")
+        super().__init__("00000", "LDA", [["10"],["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = value_source
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].value, 0)
             #self.line_displayer("LDA", [memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name,
@@ -172,11 +179,12 @@ class LDA(instruction):
 #2
 class STR(instruction):
     def __init__(self):
-        super().__init__("00001", "STR")
+        super().__init__("00001", "STR", [["01"], ["10", "11"]])
     def execute_instruction(self, var_dest, value_source, param_trash):
         var_dest.value = value_source
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
             #self.line_displayer("STR", [memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].name])
@@ -206,13 +214,14 @@ class STR(instruction):
 #3
 class PUSH(instruction):
     def __init__(self):
-        super().__init__("00010", "PUSH")
+        super().__init__("00010", "PUSH", [["10"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
         if(stack.current_size + value_source.__sizeof__() <= stack.max_size):
             stack.stack_content.append(value_source)
             stack.current_size += value_source.__sizeof__()
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         #self.line_displayer("PUSH")
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value, 0, 0)
     def bin_parser(self, lign):
@@ -227,7 +236,7 @@ class PUSH(instruction):
 #4
 class POP(instruction):
     def __init__(self):
-        super().__init__("00011", "POP")
+        super().__init__("00011", "POP", [["10"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
         if(0 < stack.current_size):
             res = stack.stack_content.pop()
@@ -235,6 +244,7 @@ class POP(instruction):
             value_source.value = res
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
 
     def bin_parser(self, lign):
@@ -249,11 +259,12 @@ class POP(instruction):
 #5
 class AND(instruction):
     def __init__(self):
-        super().__init__("00100", "AND")
+        super().__init__("00100", "AND", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value & value_source
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
@@ -278,11 +289,12 @@ class AND(instruction):
 #6
 class OR(instruction):
     def __init__(self):
-        super().__init__("00101", "OR")
+        super().__init__("00101", "OR", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value | value_source
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
@@ -307,11 +319,12 @@ class OR(instruction):
 #7
 class NOT(instruction):
     def __init__(self):
-        super().__init__("00110", "NOT")
+        super().__init__("00110", "NOT", [["10"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = ~reg_dest.value
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
 
     def bin_parser(self, lign):
@@ -326,11 +339,12 @@ class NOT(instruction):
 #8
 class ADD(instruction):
     def __init__(self):
-        super().__init__("00111", "ADD")
+        super().__init__("00111", "ADD", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trah):
         reg_dest.value = reg_dest.value + value_source
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
@@ -355,11 +369,12 @@ class ADD(instruction):
 #9
 class SUB(instruction):
     def __init__(self):
-        super().__init__("01000", "SUB")
+        super().__init__("01000", "SUB", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value - value_source
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
@@ -384,11 +399,12 @@ class SUB(instruction):
 #10
 class DIV(instruction):
     def __init__(self):
-        super().__init__("01001", "DIV")
+        super().__init__("01001", "DIV", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = value_source // reg_dest.value
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
@@ -413,13 +429,14 @@ class DIV(instruction):
 #11
 class MUL(instruction):
     def __init__(self):
-        super().__init__("01010", "MUL")
+        super().__init__("01010", "MUL", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value * value_source
         return 0
 
 
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value,
                                      0)
@@ -445,12 +462,13 @@ class MUL(instruction):
 #12
 class MOD(instruction):
     def __init__(self):
-        super().__init__("01011", "MOD")
+        super().__init__("01011", "MOD", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = value_source % reg_dest.value
         return 0
 
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value,
                                      0)
@@ -476,11 +494,12 @@ class MOD(instruction):
 #13
 class INC(instruction):
     def __init__(self):
-        super().__init__("01100", "INC")
+        super().__init__("01100", "INC", [["10"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value += 1
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
     def bin_parser(self, lign):
         res = [lign[:5]]
@@ -494,12 +513,13 @@ class INC(instruction):
 #14
 class DEC(instruction):
     def __init__(self):
-        super().__init__("01101", "DEC")
+        super().__init__("01101", "DEC", [["10"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value -= 1
         return 0
 
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
 
     def bin_parser(self, lign):
@@ -514,12 +534,13 @@ class DEC(instruction):
 #15
 class BEQ(instruction):
     def __init__(self):
-        super().__init__("01110", "BEQ")
+        super().__init__("01110", "BEQ", [["10", "01", "11"], ["10", "01", "11"], ["00"]])
     def execute_instruction(self, first_argument, second_argument, target_label):
         if (first_argument == second_argument):
             return target_label.value
         return 0
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(parsed_list[1])
         second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(parsed_list[3])
         return self.execute_instruction(first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))])
@@ -541,13 +562,14 @@ class BEQ(instruction):
 #16
 class BNE(instruction):
     def __init__(self):
-        super().__init__("01111", "BNE")
+        super().__init__("01111", "BNE", [["10", "01", "11"], ["10", "01", "11"], ["00"]])
     def execute_instruction(self, first_argument, second_argument, target_label):
         if (first_argument != second_argument):
             return target_label.value
         return 0
 
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(
             parsed_list[1])
         second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(
@@ -571,13 +593,14 @@ class BNE(instruction):
 #17
 class BBG(instruction):
     def __init__(self):
-        super().__init__("10000", "BBG")
+        super().__init__("10000", "BBG", [["10", "01", "11"], ["10", "01", "11"], ["00"]])
     def execute_instruction(self, first_agument, seconde_argumet, target_label):
         if (first_agument > seconde_argumet):
             return target_label.value
         return 0
 
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(
             parsed_list[1])
         second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(
@@ -601,13 +624,14 @@ class BBG(instruction):
 #18
 class BSM(instruction):
     def __init__(self):
-        super().__init__("10001", "BSM")
+        super().__init__("10001", "BSM", [["10", "01", "11"], ["10", "01", "11"], ["00"]])
     def execute_instruction(self, first_argument, seconde_argument, target_label):
         if (first_argument < seconde_argument):
             return target_label.value
         return 0
 
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(
             parsed_list[1])
         second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(
@@ -631,10 +655,11 @@ class BSM(instruction):
 #19
 class JMP(instruction):
     def __init__(self):
-        super().__init__("10010", "JMP")
+        super().__init__("10010", "JMP", [["00"]])
     def execute_instruction(self, target_label, param_trash_0, param_trash_1):
         return target_label.value
     def param_selection(self, parsed_list):
+        self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
 
     def bin_parser(self, lign):
@@ -649,7 +674,7 @@ class JMP(instruction):
 #20
 class HLT(instruction):
     def __init__(self):
-        super().__init__("10011", "HLT")
+        super().__init__("10011", "HLT", [])
     def execute_instruction(self, param_trash_0, param_trash_1, param_trash_2): #DONE: rewrite the function
         return -1
     def param_selection(self, parsed_list=0):
