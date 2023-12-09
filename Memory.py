@@ -236,7 +236,7 @@ class PUSH(instruction):
 #4
 class POP(instruction):
     def __init__(self):
-        super().__init__("00011", "POP", [["10","01","11"]])
+        super().__init__("00011", "POP", [["10"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
         if(0 < stack.current_size):
             res = stack.stack_content.pop()
