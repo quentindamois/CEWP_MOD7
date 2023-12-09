@@ -214,7 +214,7 @@ class STR(instruction):
 #3
 class PUSH(instruction):
     def __init__(self):
-        super().__init__("00010", "PUSH", [["10"]])
+        super().__init__("00010", "PUSH", [["10","01","11"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
         if(stack.current_size + value_source.__sizeof__() <= stack.max_size):
             stack.stack_content.append(value_source)
@@ -236,7 +236,7 @@ class PUSH(instruction):
 #4
 class POP(instruction):
     def __init__(self):
-        super().__init__("00011", "POP", [["10"]])
+        super().__init__("00011", "POP", [["10","01","11"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
         if(0 < stack.current_size):
             res = stack.stack_content.pop()
