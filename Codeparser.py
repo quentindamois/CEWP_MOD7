@@ -102,7 +102,7 @@ def code_parser(code_part): #complete the fonnction so that it result in a strin
 
             bin_file_content += instruction.intruction_dict[instruction_convertion[line_i[0]]].bin_writer(line_i) #this is tha line that convertert a line whith an instruction to a a binary line
         elif (re.findall(".+:", code_part[i])):
-            tag_designed = re.sub("\s", "", code_part[i])
+            tag_designed = re.sub("\s", "", code_part[i])[:]
             bin_file_content += ("11111" + memory.memory_address[memory.binary_name[tag_designed.split(":")[0]]].to_binary(25) + "\n") #this is the line where we parse the line with tag
             memory.memory_address[memory.binary_name[tag_designed.split(":")[0]]].value = i #actualise the value to make sure that the label doesn't point to a line
         #if it is not identifired as line for instruction or a line were a tag is located
@@ -129,7 +129,8 @@ def init_and_code_to_bin():
     #we are assigning a binary code for each
     num_var = 0
     for l in clean_line[0]:
-        temp_l = l.split(" ")
+        temp_l = re.split("\s+", l)[:]
+        temp_l = temp_l[:] if temp_l[0] != '' else temp_l[1:]
         #we create a variable by giving it a name wichi is a number in bit and giving it a value which is made by the user
         variable(temp_l[1], temp_l[0], '{0:07b}'.format(num_var))
         num_var += 1
