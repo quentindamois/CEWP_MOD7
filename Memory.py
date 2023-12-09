@@ -5,12 +5,22 @@ import re
 #this is the objected oriented part of the programm were the programm is run once it is parsed
 #this is justed a library and the relant object are used when necessary in the main file
 
+
+def binstr_to_bin_neg(number):
+    res = 0
+    for i in range(len(number) - 1):
+        if number[-(i + 1)] == '1':
+            res += 2 ** i
+    if (number[0] == "1"):
+        res *= -1
+    return res
 def binstr_to_bin(number):
     res = 0
     for i in range(len(number)):
         if number[-(i + 1)] == '1':
            res += 2**i
     return res
+
 def rm_last_bit(binary):
     n = 0
     while(binary[n] != "1" and n + 1 < len(binary)):
@@ -29,7 +39,7 @@ def check_arg(type_arg, arg, op_code, number): #this function is probably useles
             return memory.memory_address[arg]
         return memory.memory_address.values
     elif (type_arg == "11"):
-        return binstr_to_bin(arg)
+        return binstr_to_bin_neg(arg)
     return 0
 
 class memory:
@@ -102,9 +112,16 @@ class instruction:
         res = self.op_code
         template_format = 0
         for i in range(0, len(param_len)):
-            if(len(re.findall("\d",lines[i + 1])) == len(lines[ 1 + i])):
+            if(len(re.findall("\d|-",lines[i + 1])) == len(lines[ 1 + i])):
                 template_format = '{0:0' + str(param_len[i]) + 'b}'
-                res += "11" + template_format.format(int(lines[i + 1]))
+                if(re.search("-", lines[i + 1])):
+                    temp = template_format.format(int(lines[i + 1][1:]))
+                    temp = "1" + temp[1:]
+                    res += "11" + temp
+                else:
+                    temp = template_format.format(int(lines[i + 1]))
+                    temp = "0" + temp[1:]
+                    res += "11" + temp
             else:
                 res += memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
         res += "\n"
@@ -156,7 +173,7 @@ class LDA(instruction):
             #self.line_displayer("LDA", [memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name,
             #                               memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
             #self.line_displayer("LDA", [memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
         return res
     def bin_parser(self, lign):
@@ -170,7 +187,7 @@ class LDA(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 16])
@@ -187,7 +204,7 @@ class STR(instruction):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
             #self.line_displayer("STR", [memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].name])
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
             #self.line_displayer("STR", [memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name,
             #                            str(binstr_to_bin(parsed_list[3]))])
         return res
@@ -207,7 +224,7 @@ class STR(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
 #3
 class PUSH(instruction):
@@ -266,7 +283,7 @@ class AND(instruction):
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
         return res
 
     def bin_parser(self, lign):
@@ -282,7 +299,7 @@ class AND(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
 #6
 class OR(instruction):
@@ -296,7 +313,7 @@ class OR(instruction):
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
         return res
 
     def bin_parser(self, lign):
@@ -310,7 +327,7 @@ class OR(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 26])
@@ -346,7 +363,7 @@ class ADD(instruction):
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
         return res
 
     def bin_parser(self, lign):
@@ -360,7 +377,7 @@ class ADD(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 26])
@@ -376,7 +393,7 @@ class SUB(instruction):
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
         return res
 
     def bin_parser(self, lign):
@@ -390,7 +407,7 @@ class SUB(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 26])
@@ -406,7 +423,7 @@ class DIV(instruction):
         if (parsed_list[2] != "11"):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value, 0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]),0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]),0)
         return res
 
     def bin_parser(self, lign):
@@ -420,7 +437,7 @@ class DIV(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 26])
@@ -439,7 +456,7 @@ class MUL(instruction):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value,
                                      0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]), 0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]), 0)
         return res
 
     def bin_parser(self, lign):
@@ -453,7 +470,7 @@ class MUL(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 26])
@@ -471,7 +488,7 @@ class MOD(instruction):
             res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value,
                                      0)
         else:
-            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin(parsed_list[3]), 0)
+            res = self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], binstr_to_bin_neg(parsed_list[3]), 0)
         return res
 
     def bin_parser(self, lign):
@@ -485,7 +502,7 @@ class MOD(instruction):
         if (parsed_list[2] != "11"):
             res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, memory.memory_address[parsed_list[2], rm_last_bit(parsed_list[3])].name])
         else:
-            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin(parsed_list[3]))])
+            res = super().line_displayer([memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name, str(binstr_to_bin_neg(parsed_list[3]))])
         return res
     def bin_writer(self, lines):
         return super().bin_writer(lines, [2, 26])
@@ -539,8 +556,8 @@ class BEQ(instruction):
         return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(parsed_list[1])
-        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(parsed_list[3])
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin_neg(parsed_list[1])
+        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin_neg(parsed_list[3])
         return self.execute_instruction(first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))])
     def bin_parser(self, lign):
         res = [lign[:5]]
@@ -552,8 +569,8 @@ class BEQ(instruction):
         res.append(lign[25:])
         return res[:]
     def line_displayer(self, parsed_list):
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
-        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin_neg(parsed_list[1]))
+        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin_neg(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
     def bin_writer(self, lines):
         return super().bin_writer(lines, [7,7,7])
@@ -568,9 +585,9 @@ class BNE(instruction):
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin_neg(
             parsed_list[1])
-        second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(
+        second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin_neg(
             parsed_list[3])
         return self.execute_instruction(first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))])
     def bin_parser(self, lign):
@@ -583,8 +600,8 @@ class BNE(instruction):
         res.append(lign[25:])
         return res[:]
     def line_displayer(self, parsed_list):
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
-        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin_neg(parsed_list[1]))
+        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin_neg(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
     def bin_writer(self, lines):
         return super().bin_writer(lines, [7,7,7])
@@ -599,9 +616,9 @@ class BBG(instruction):
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin_neg(
             parsed_list[1])
-        second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(
+        second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin_neg(
             parsed_list[3])
         return self.execute_instruction(first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))])
     def bin_parser(self, lign):
@@ -614,8 +631,8 @@ class BBG(instruction):
         res.append(lign[25:])
         return res[:]
     def line_displayer(self, parsed_list):
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
-        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin_neg(parsed_list[1]))
+        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin_neg(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
     def bin_writer(self, lines):
         return super().bin_writer(lines, [7,7,7])
@@ -630,9 +647,9 @@ class BSM(instruction):
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin_neg(
             parsed_list[1])
-        second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin(
+        second_param = memory.memory_address[(parsed_list[2], rm_last_bit(parsed_list[3]))].value if parsed_list[2] != "11" else binstr_to_bin_neg(
             parsed_list[3])
         return self.execute_instruction(first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))])
     def bin_parser(self, lign):
@@ -645,8 +662,8 @@ class BSM(instruction):
         res.append(lign[25:])
         return res[:]
     def line_displayer(self, parsed_list):
-        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin(parsed_list[1]))
-        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin(parsed_list[3]))
+        first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].name if parsed_list[0] != "11" else str(binstr_to_bin_neg(parsed_list[1]))
+        second_param = memory.memory_address[ (parsed_list[2], rm_last_bit(parsed_list[3]))].name if parsed_list[2] != "11" else str(binstr_to_bin_neg(parsed_list[3]))
         return super().line_displayer([first_param, second_param, memory.memory_address[(parsed_list[4], rm_last_bit(parsed_list[5]))].name])
     def bin_writer(self, lines):
         return super().bin_writer(lines, [7,7,7])
