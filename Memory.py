@@ -51,11 +51,9 @@ class parameter(memory):
         self.type = type
         self.value = int(value)
         self.var_code = var_code
-        self.name = name #probaby change to being a binary code specific to a variable or a register
-        self.address = memory.total_size #i don t really know what to do with it since it may not benecessary for the first part
+        self.name = name
         memory.memory_address[ (type, rm_last_bit(var_code))] = self
         memory.total_size = memory.total_size + self.__sizeof__()
-        #memory.name_binary[rm_last_bit(var_code)] = name
         memory.binary_name[name] = (self.type, rm_last_bit(var_code))
     def to_binary(self, n):
         #to reference a parameter in binary we first add its type then the var_code with a varying amount of bit
