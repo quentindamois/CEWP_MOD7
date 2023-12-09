@@ -83,7 +83,9 @@ def find_label(label_asked, code_content):
 def tag_parser(code_content):
     line_label = re.findall(".+:", "\n".join(code_content))[:]
     for i in range(0,len(line_label)):
-        label(find_label(line_label[i], code_content), line_label[i][:-1], '{0:07b}'.format(i))
+        tag_name = re.sub("\s", "", line_label[i])
+        tag_name = tag_name.split(":")[0]
+        label(find_label(line_label[i], code_content), tag_name, '{0:07b}'.format(i))
 
 def reg_init():
     for i in range(0,4):
@@ -94,12 +96,15 @@ def code_parser(code_part): #complete the fonnction so that it result in a strin
 
     instruction_convertion = {"LDA": "00000", "STR": "00001", "PUSH": "00010", "POP": "00011", "AND": "00100","OR": "00101", "NOT": "00110", "ADD": "00111", "SUB": "01000", "DIV": "01001","MUL": "01010", "MOD": "01011", "INC": "01100", "DEC": "01101", "BEQ": "01110","BNE": "01111", "BBG": "10000", "BSM": "10001", "JMP": "10010", "HLT": "10011"}
     for i in range(0, len(code_part)):
-        if (code_part[i].split(" ")[0] in instruction_convertion.keys()):
-            line_i = code_part[i].split(" ")
+        line_i = re.split("\s+", code_part[i])[:]
+        line_i = line_i[:] if line_i[0] != '' else line_i[1:]
+        if (line_i[0] in instruction_convertion.keys()):
+
             bin_file_content += instruction.intruction_dict[instruction_convertion[line_i[0]]].bin_writer(line_i) #this is tha line that convertert a line whith an instruction to a a binary line
         elif (re.findall(".+:", code_part[i])):
-            bin_file_content += ("11111" + memory.memory_address[memory.binary_name[code_part[i].split(":")[0]]].to_binary(25) + "\n") #this is the line where we parse the line with tag
-            memory.memory_address[memory.binary_name[code_part[i].split(":")[0]]].value = i #actualise the value to make sure that the label doesn't point to a line
+            tag_designed = re.sub("\s", "", code_part[i])
+            bin_file_content += ("11111" + memory.memory_address[memory.binary_name[tag_designed.split(":")[0]]].to_binary(25) + "\n") #this is the line where we parse the line with tag
+            memory.memory_address[memory.binary_name[tag_designed.split(":")[0]]].value = i #actualise the value to make sure that the label doesn't point to a line
         #if it is not identifired as line for instruction or a line were a tag is located
     return bin_file_content[:-1]
 

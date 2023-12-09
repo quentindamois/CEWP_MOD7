@@ -136,8 +136,8 @@ class runner:
                 temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].param_selection(parsed[index_ligne][1:])
                 print(instruction.intruction_dict[parsed[index_ligne][0]].line_displayer(parsed[index_ligne][1:]))
             else:
-                temp_rec = 0
-            index_ligne  = temp_rec if temp_rec != 0  else index_ligne + 1
+                temp_rec = -2
+            index_ligne  = temp_rec if temp_rec != -2  else index_ligne + 1
         memory_displayer()
         print(memory.memory_address)
         return 0
@@ -150,7 +150,7 @@ class LDA(instruction):
         super().__init__("00000", "LDA", [["10"],["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = value_source
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -182,7 +182,7 @@ class STR(instruction):
         super().__init__("00001", "STR", [["01"], ["10", "11"]])
     def execute_instruction(self, var_dest, value_source, param_trash):
         var_dest.value = value_source
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -219,7 +219,7 @@ class PUSH(instruction):
         if(stack.current_size + value_source.__sizeof__() <= stack.max_size):
             stack.stack_content.append(value_source)
             stack.current_size += value_source.__sizeof__()
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         #self.line_displayer("PUSH")
@@ -242,7 +242,7 @@ class POP(instruction):
             res = stack.stack_content.pop()
             stack.current_size -= res.__sizeof__()
             value_source.value = res
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
@@ -262,7 +262,7 @@ class AND(instruction):
         super().__init__("00100", "AND", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value & value_source
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -292,7 +292,7 @@ class OR(instruction):
         super().__init__("00101", "OR", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value | value_source
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -322,7 +322,7 @@ class NOT(instruction):
         super().__init__("00110", "NOT", [["10"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = ~reg_dest.value
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
@@ -342,7 +342,7 @@ class ADD(instruction):
         super().__init__("00111", "ADD", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trah):
         reg_dest.value = reg_dest.value + value_source
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -372,7 +372,7 @@ class SUB(instruction):
         super().__init__("01000", "SUB", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value - value_source
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -402,7 +402,7 @@ class DIV(instruction):
         super().__init__("01001", "DIV", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = value_source // reg_dest.value
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         if (parsed_list[2] != "11"):
@@ -432,7 +432,7 @@ class MUL(instruction):
         super().__init__("01010", "MUL", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = reg_dest.value * value_source
-        return 0
+        return -2
 
 
     def param_selection(self, parsed_list):
@@ -465,7 +465,7 @@ class MOD(instruction):
         super().__init__("01011", "MOD", [["10"], ["10", "01", "11"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value = value_source % reg_dest.value
-        return 0
+        return -2
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
@@ -497,7 +497,7 @@ class INC(instruction):
         super().__init__("01100", "INC", [["10"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value += 1
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))], 0, 0)
@@ -516,7 +516,7 @@ class DEC(instruction):
         super().__init__("01101", "DEC", [["10"]])
     def execute_instruction(self, reg_dest, value_source, param_trash):
         reg_dest.value -= 1
-        return 0
+        return -2
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
@@ -538,7 +538,7 @@ class BEQ(instruction):
     def execute_instruction(self, first_argument, second_argument, target_label):
         if (first_argument == second_argument):
             return target_label.value
-        return 0
+        return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         first_param = memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value if parsed_list[0] != "11" else binstr_to_bin(parsed_list[1])
@@ -566,7 +566,7 @@ class BNE(instruction):
     def execute_instruction(self, first_argument, second_argument, target_label):
         if (first_argument != second_argument):
             return target_label.value
-        return 0
+        return -2
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
@@ -597,7 +597,7 @@ class BBG(instruction):
     def execute_instruction(self, first_agument, seconde_argumet, target_label):
         if (first_agument > seconde_argumet):
             return target_label.value
-        return 0
+        return -2
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
@@ -628,7 +628,7 @@ class BSM(instruction):
     def execute_instruction(self, first_argument, seconde_argument, target_label):
         if (first_argument < seconde_argument):
             return target_label.value
-        return 0
+        return -2
 
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
