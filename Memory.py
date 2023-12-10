@@ -241,7 +241,6 @@ class PUSH(instruction):
         super().__init__("00010", "PUSH", [["10","01","11"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
         if(stack.current_size + value_source.__sizeof__() <= stack.max_size):
-            print("we can add")
             stack.stack_content.append(value_source)
             stack.current_size += value_source.__sizeof__()
         return -2
