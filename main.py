@@ -45,7 +45,7 @@ if __name__ == '__main__':
     btn_end.grid(column=1, row=1)
     btn_reset = tkinter.Button(window, text="reset the execution", command=reset_execution)
     btn_reset.grid(column=2, row=1)
-    label_indication = tkinter.Label(window, text="enter the file name with .txt at the end")
+    label_indication = tkinter.Label(window, text="enter the path to the file with .txt at the end")
     label_indication.grid(column=1, row=2)
     file_entry = tkinter.Entry(window)
     file_entry.grid(column=1, row=3)
