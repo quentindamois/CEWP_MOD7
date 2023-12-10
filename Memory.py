@@ -7,6 +7,7 @@ import re
 
 
 def binstr_to_bin_neg(number):
+    #this function actualy convert from binary to an integrer
     res = 0
     for i in range(len(number) - 1):
         if number[-(i + 1)] == '1':
@@ -15,6 +16,7 @@ def binstr_to_bin_neg(number):
         res *= -1
     return res
 def binstr_to_bin(number):
+    # this function actualy convert from binary to an integrer
     res = 0
     for i in range(len(number)):
         if number[-(i + 1)] == '1':
