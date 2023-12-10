@@ -52,7 +52,7 @@ def check_arg(type_arg, arg, op_code, number): #this function is probably useles
 
 def reset_stack_and_memory():
     memory.memory_address = {}
-    memory.total_size = 0
+    memory.current_size = 0
     memory.name_binary = {}
     memory.binary_name = {}
     stack.stack_content = []
@@ -65,8 +65,10 @@ class memory:
 
 def string_stack():
     res = f"size: {stack.current_size}\n"
+    i = 0
     for v in stack.stack_content:
-        res += f"{stack.stack_content.index(v)} : {v}\n"
+        res += f"{i} : {v}\n"
+        i += 1
     return res
 
 class stack:
