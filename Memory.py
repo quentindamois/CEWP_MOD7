@@ -52,10 +52,11 @@ def check_arg(type_arg, arg, op_code, number): #this function is probably useles
 
 def reset_stack_and_memory():
     memory.memory_address = {}
-    memory.current_size = 0
+    memory.total_size = 0
     memory.name_binary = {}
     memory.binary_name = {}
     stack.stack_content = []
+    stack.current_size = 0
 class memory:
     #this the class memory this class is an interface like class used for the parameter class as a mean to have a static method for the variable
     memory_address = {}
