@@ -13,9 +13,10 @@ class runner:
         self.index_ligne = 0
     def show_line(self):
         res = ""
+        index = 0
         for l in self.parsed:
             i = self.parsed.index(l)
-            if (self.index_ligne == i):
+            if (self.index_ligne == index):
                 res += "->"
             if (l[0] != "11111"):
                 res += "\t" + instruction.intruction_dict[l[0]].line_displayer(l[1:]) + "\n"
@@ -23,6 +24,7 @@ class runner:
                  res += "\t" + memory.memory_address[l[1], rm_last_bit(l[2])].name + ":\n"
 
             print(f"i = {i}")
+            index += 1
         return res
 
     def execute_step(self):  # the line_tag store the tag in the code
