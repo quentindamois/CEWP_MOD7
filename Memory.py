@@ -34,10 +34,9 @@ def memory_displayer():
     print("____________________________________")
 
 def memory_string():
-    res = "____________________________________\n"
+    res = "parameter:\n"
     for i in memory.memory_address.values():
          res += f"{i.name} = {i.value}\n"
-    res += "____________________________________\n"
     return res
 
 def check_arg(type_arg, arg, op_code, number): #this function is probably useless
@@ -55,13 +54,18 @@ def reset_stack_and_memory():
     memory.name_binary = {}
     memory.binary_name = {}
     stack.stack_content = []
-    stack.max_size = 0
 class memory:
     #this the class memory this class is an interface like class used for the parameter class as a mean to have a static method for the variable
     memory_address = {}
     total_size = 0
     name_binary = {}
     binary_name = {}
+
+def string_stack():
+    res = f"size: {stack.current_size}\n"
+    for v in stack.stack_content:
+        res += f"{stack.stack_content.index(v)} : {v}\n"
+    return res
 
 class stack:
     stack_content = []
@@ -235,13 +239,17 @@ class PUSH(instruction):
     def __init__(self):
         super().__init__("00010", "PUSH", [["10","01","11"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
+        print(f"We can add {stack.current_size + value_source.__sizeof__() <= stack.max_size}")
+        print(f"the value of the total {stack.current_size + value_source.__sizeof__()}")
         if(stack.current_size + value_source.__sizeof__() <= stack.max_size):
+            print("we can add")
             stack.stack_content.append(value_source)
             stack.current_size += value_source.__sizeof__()
         return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
         #self.line_displayer("PUSH")
+        print(f"in the param select {parsed_list}")
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value, 0, 0)
     def bin_parser(self, lign):
         res = [lign[:5]]

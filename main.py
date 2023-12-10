@@ -3,9 +3,9 @@ import tkinter
 import Memory
 from execute_file import *
 def actulise():
-    label_var["text"] = Memory.memory_string()
+    label_var["text"] = Memory.memory_string() + f"PC = {main_runner[0].index_ligne}"
+    label_stack["text"] = "stack:\n" + Memory.string_stack()
     label_code["text"] = main_runner[0].show_line()
-    print(f"self.index_ligne = {main_runner[0].index_ligne}")
 def one_step():
     main_runner[0].execute_step()
     actulise()
@@ -32,11 +32,13 @@ if __name__ == '__main__':
     main_runner = [runner(file_name[0])]
     window = tkinter.Tk()
     window.title("simulator")
-    window.geometry('550x350')
+    window.geometry('440x325')
     label_var = tkinter.Label(window, text="non initialised")
     label_var.grid(column=0, row=0)
     label_code = tkinter.Label(window, text="non initialised")
     label_code.grid(column=2, row=0)
+    label_stack = tkinter.Label(window, text="non initialised")
+    label_stack.grid(column=1, row=0)
     btn_step = tkinter.Button(window, text="execute on step", command=one_step)
     btn_step.grid(column=0, row=1)
     btn_end = tkinter.Button(window, text="excute until the end", command=until_end)
