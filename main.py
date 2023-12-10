@@ -29,7 +29,7 @@ if __name__ == '__main__':
     main_runner = [runner(file_name[0])]
     window = tkinter.Tk()
     window.title("simulator")
-    window.geometry('440x325')
+    window.geometry('540x625')
     label_var = tkinter.Label(window, text="non initialised")
     label_var.grid(column=0, row=0)
     label_code = tkinter.Label(window, text="non initialised")
