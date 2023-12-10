@@ -131,7 +131,6 @@ class instruction:
     def bin_writer(self, lines, param_len):
         res = self.op_code
         template_format = 0
-        print(lines)
         for i in range(0, len(param_len)):
             if(len(re.findall("\d|-",lines[i + 1])) == len(lines[ 1 + i])):
                 template_format = '{0:0' + str(param_len[i]) + 'b}'
@@ -148,9 +147,6 @@ class instruction:
                     temp = "0" + temp[1:]
                     res += "11" + temp
             else:
-                print("aaaaaaaa")
-                print(memory.memory_address)
-                print(memory.binary_name)
                 temp = memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
                 if (len(temp) - 2 > param_len[i]):
                     temp = temp[:2] + temp[-param_len[1]:]
@@ -241,8 +237,6 @@ class PUSH(instruction):
     def __init__(self):
         super().__init__("00010", "PUSH", [["10","01","11"]])
     def execute_instruction(self, value_source, param_trash_0, param_trash_1):
-        print(f"We can add {stack.current_size + value_source.__sizeof__() <= stack.max_size}")
-        print(f"the value of the total {stack.current_size + value_source.__sizeof__()}")
         if(stack.current_size + value_source.__sizeof__() <= stack.max_size):
             print("we can add")
             stack.stack_content.append(value_source)
@@ -250,8 +244,6 @@ class PUSH(instruction):
         return -2
     def param_selection(self, parsed_list):
         self.param_type_check(parsed_list)
-        #self.line_displayer("PUSH")
-        print(f"in the param select {parsed_list}")
         return self.execute_instruction(memory.memory_address[(parsed_list[0], rm_last_bit(parsed_list[1]))].value, 0, 0)
     def bin_parser(self, lign):
         res = [lign[:5]]

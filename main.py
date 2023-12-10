@@ -16,10 +16,7 @@ def until_end():
 
 def reset_execution():
     reset_stack_and_memory()
-    print(file_name)
     main_runner[0].change(file_name[0])
-
-    print(f"the programme is now {main_runner[0].index_ligne}")
     actulise()
 
 def change_file(tet):
