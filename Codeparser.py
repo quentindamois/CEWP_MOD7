@@ -114,7 +114,11 @@ def comment_remover(code):
             code[i][j] = code[i][j].split("!")[0][:]
     return code[:]
 
-
+def is_not_name_rep(name):
+    i = 0
+    while ((name != str("t" + str(i))) and i < 5):
+        i += 1
+    return i >= 5
 
 def init_and_code_to_bin():
     reg_init()
@@ -132,8 +136,9 @@ def init_and_code_to_bin():
         temp_l = re.split("\s+", l)[:]
         temp_l = temp_l[:] if temp_l[0] != '' else temp_l[1:]
         #we create a variable by giving it a name wichi is a number in bit and giving it a value which is made by the user
-        variable(temp_l[1], temp_l[0], '{0:07b}'.format(num_var))
-        num_var += 1
+        if (is_not_name_rep(temp_l[0])):
+            variable(temp_l[1], temp_l[0], '{0:07b}'.format(num_var))
+            num_var += 1
     #we have to seperate the line with the tag and the line without
 
     init_inst() #initialisation of the instrucition
