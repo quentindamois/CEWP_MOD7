@@ -28,7 +28,7 @@ def change_file(tet):
 
 
 if __name__ == '__main__':
-    file_name = ["essaiefile.txt.txt"]
+    file_name = ["test_program.txt"]
     main_runner = [runner(file_name[0])]
     window = tkinter.Tk()
     window.title("simulator")
