@@ -1,8 +1,8 @@
 from Memory import *
 import re
 
-def get_code():
-    file = open("essaiefile.txt.txt","r") #we open the file to read it
+def get_code(file_name):
+    file = open(file_name,"r") #we open the file to read it
     res = file.read()
     file.close()
     return res
@@ -120,10 +120,10 @@ def is_not_name_rep(name):
         i += 1
     return i >= 5
 
-def init_and_code_to_bin():
+def init_and_code_to_bin(file_name):
     reg_init()
     #we need to differciented the data and the code
-    seperated_line = re.split("#DATA|#CODE", get_code())[1:]
+    seperated_line = re.split("#DATA|#CODE", get_code(file_name))[1:]
     for p in range(0, len(seperated_line)):
         seperated_line[p] = seperated_line[p].split("\n")[:]
     clean_line = empty(seperated_line)

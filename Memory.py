@@ -141,28 +141,7 @@ class instruction:
 
 
 
-class runner:
-    #the runner class is used to instancied an object tha will execute each line of code
 
-    def execute(self,parsed): #the line_tag store the tag in the code
-        #parsed is the binary seperated in chunck of relevant information
-        #for example the first block is always the op code of the instruction
-        #new take for the line navigatio
-        #uncomplete is used as a condition for navigating
-        index_ligne = 0 #index_lign is used to chose wich line need to be executed
-        while 0 <= index_ligne: #DONE: change the condition because the instruction for the end is not always the last
-            set_instruction = set(instruction.intruction_dict.keys())
-            memory_displayer()
-            if (parsed[index_ligne][0] in set_instruction):
-                print(parsed[index_ligne])
-                temp_rec = instruction.intruction_dict[parsed[index_ligne][0]].param_selection(parsed[index_ligne][1:])
-                print(instruction.intruction_dict[parsed[index_ligne][0]].line_displayer(parsed[index_ligne][1:]))
-            else:
-                temp_rec = -2
-            index_ligne  = temp_rec if temp_rec != -2  else index_ligne + 1
-        memory_displayer()
-        print(memory.memory_address)
-        return 0
 
 #in each instruction we use the parant initialisation with the op code specific to that instruction
 #DONE: remove the conver to bin

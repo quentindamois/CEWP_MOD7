@@ -4,8 +4,8 @@ from Codeparser import *
 
 class runner:
     #the runner class is used to instancied an object tha will execute each line of code
-    def __init__(self):
-        self.parsed = instruction_parsing(bin_part(init_and_code_to_bin()))
+    def __init__(self, file_name):
+        self.parsed = instruction_parsing(bin_part(init_and_code_to_bin(file_name)))
         self.index_ligne = 0
 
     def execute_step(self):  # the line_tag store the tag in the code
@@ -49,6 +49,20 @@ class runner:
         print(memory.memory_address)
         return 0
 
+def main():
+    execution_object = runner("essaiefile.txt.txt")
+    user_choice = 1
+    while(execution_object.index_ligne >= 0 and user_choice in {1, 2, 3}):
+        user_choice = int(input("Enter one to execute one step and 2 to execute from current line to the end, endter 3 to relof the code and 4 to execute completely the code:"))
+        if(user_choice == 1):
+            execution_object.execute_step()
+        elif(user_choice == 2):
+            execution_object.execute_full()
+        elif(user_choice == 3):
+            execution_object = runner("essaiefile.txt.txt")
+        elif(user_choice == 4):
+            runner("essaiefile.txt.txt").execute_full()
+main()
 
-essaie = runner()
-essaie.execute_step()
+
+
