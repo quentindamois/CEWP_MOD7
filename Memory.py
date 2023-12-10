@@ -33,6 +33,13 @@ def memory_displayer():
         print(f"{i.name} = {i.value}")
     print("____________________________________")
 
+def memory_string():
+    res = "____________________________________\n"
+    for i in memory.memory_address.values():
+         res += f"{i.name} = {i.value}\n"
+    res += "____________________________________\n"
+    return res
+
 def check_arg(type_arg, arg, op_code, number): #this function is probably useless
     if (op_code != "10011" and type_arg != "11"):
         if(number == 1 and(15  < binstr_to_bin(op_code) or 19 > binstr_to_bin(op_code))):
@@ -42,6 +49,13 @@ def check_arg(type_arg, arg, op_code, number): #this function is probably useles
         return binstr_to_bin_neg(arg)
     return 0
 
+def reset_stack_and_memory():
+    memory.memory_address = {}
+    memory.total_size = 0
+    memory.name_binary = {}
+    memory.binary_name = {}
+    stack.stack_content = []
+    stack.max_size = 0
 class memory:
     #this the class memory this class is an interface like class used for the parameter class as a mean to have a static method for the variable
     memory_address = {}
@@ -111,6 +125,7 @@ class instruction:
     def bin_writer(self, lines, param_len):
         res = self.op_code
         template_format = 0
+        print(lines)
         for i in range(0, len(param_len)):
             if(len(re.findall("\d|-",lines[i + 1])) == len(lines[ 1 + i])):
                 template_format = '{0:0' + str(param_len[i]) + 'b}'
@@ -127,6 +142,9 @@ class instruction:
                     temp = "0" + temp[1:]
                     res += "11" + temp
             else:
+                print("aaaaaaaa")
+                print(memory.memory_address)
+                print(memory.binary_name)
                 temp = memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
                 if (len(temp) - 2 > param_len[i]):
                     temp = temp[:2] + temp[-param_len[1]:]

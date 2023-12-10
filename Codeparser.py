@@ -1,10 +1,12 @@
 from Memory import *
 import re
 
-def get_code(file_name):
+def get_code_assembly(file_name):
+    print(file_name)
     file = open(file_name,"r") #we open the file to read it
     res = file.read()
     file.close()
+    print(res)
     return res
 
 def part_separation(file_content):
@@ -123,7 +125,10 @@ def is_not_name_rep(name):
 def init_and_code_to_bin(file_name):
     reg_init()
     #we need to differciented the data and the code
-    seperated_line = re.split("#DATA|#CODE", get_code(file_name))[1:]
+    print("init and code to bin")
+    print(file_name)
+    seperated_line = re.split("#DATA|#CODE", get_code_assembly(file_name))[1:]
+    print(seperated_line)
     for p in range(0, len(seperated_line)):
         seperated_line[p] = seperated_line[p].split("\n")[:]
     clean_line = empty(seperated_line)
