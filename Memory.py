@@ -116,14 +116,21 @@ class instruction:
                 template_format = '{0:0' + str(param_len[i]) + 'b}'
                 if(re.search("-", lines[i + 1])):
                     temp = template_format.format(int(lines[i + 1][1:]))
+                    if (len(temp) > param_len[i]):
+                        temp = temp[-param_len:]
                     temp = "1" + temp[1:]
                     res += "11" + temp
                 else:
                     temp = template_format.format(int(lines[i + 1]))
+                    if (len(temp) > param_len[i]):
+                        temp = temp[-param_len:]
                     temp = "0" + temp[1:]
                     res += "11" + temp
             else:
-                res += memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
+                temp = memory.memory_address[memory.binary_name[lines[i + 1]]].to_binary(param_len[i])
+                if (len(temp) - 2 > param_len[i]):
+                    temp = temp[:2] + temp[-param_len[1]:]
+                res += temp
         res += "\n"
         return res
     def param_type_check(self, lines):
